@@ -2,12 +2,14 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
+const storeRegex = RegExp(process.env.REGEX_STORE);
+
 const storeSchema = new Schema({
     storeId: {
         type: String,
         required: true,
         unique: true,
-        match: /[0-9]{5}\/GOR\/MAG/
+        match: storeRegex
     },
     storeOldId: {
         type: String,

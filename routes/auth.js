@@ -22,6 +22,12 @@ router.route('/register').post(async (req, res) => {
         name: req.body.name,
         email: req.body.email,
         password,
+        roles: {
+            admin: false,
+            store: false,
+            archive: false,
+            library: false,
+        },
     });
 
     user.save()
@@ -47,6 +53,7 @@ router.route('/login').post(async(req, res) => {
     {
         name: user.name,
         id: user._id,
+        roles: user.roles,
     },
     process.env.TOKEN_SECRET
     );

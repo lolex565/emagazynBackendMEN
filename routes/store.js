@@ -27,7 +27,6 @@ router.route('/add').post((req, res) => {
         const storeId = String(process.env.STORE_PREFIX+stamp);
         const newCount = Number(counter.count+1);
         const update = { count: newCount };
-        console.log(newCount);
         let doc = await Counter.findOneAndUpdate({module:"store"}, {count: newCount})
 
         const newItem = new Store({

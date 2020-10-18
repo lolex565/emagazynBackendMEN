@@ -26,9 +26,19 @@ const userSchema = new Schema({
         type: Date,
         default: Date.now,
     },
-    role: {
-        type: Array,
-        uniqueItems: true,
+    roles: {
+        admin: {
+            type: Boolean,
+        },
+        store: {
+            type: Boolean,
+        },
+        archive: {
+            type: Boolean,
+        },
+        library: {
+            type: Boolean,
+        },
     },
 });
 

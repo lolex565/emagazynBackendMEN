@@ -24,6 +24,6 @@ const initialize = async () => {
 
     // });
 };
-
+//TODO zrobić countery dla archiwum i biblioteki
 
 module.exports = {exist:exist, initialize:initialize};

@@ -23,7 +23,7 @@ const storeSchema = new Schema({
     storeStatus: {
         type: String,
         required: false,
-        
+
     },
 }, {
     timestamps: true,

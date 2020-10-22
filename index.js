@@ -26,9 +26,13 @@ connection.once('open', () => {
 });
 
 const storeRoutes = require('./routes/store');
-const authRoutes = require("./routes/auth");
+const authRoutes = require('./routes/auth');
+const verifyToken = require('./routes/token_validators/validate-token');
+const verifyStoreToken = require('./routes/token_validators/validate-store-token');
+const publicStoreRoutes = require('./routes/public-store-routes');
 
-app.use('/store', storeRoutes);
+app.use('/public/store', publicStoreRoutes);
+app.use('/store', verifyStoreToken, storeRoutes);
 app.use('/auth', authRoutes);
 
 app.listen(port, () => {

@@ -17,3 +17,5 @@ LIBRARY_PREFIX=
 EMAIL_REGEX=
 TOKEN_SECRET=
 ```
+## dla frontu
+autoryzacja odbywa się poprzez dodanie tokena do requestów w headerze AUTH-TOKEN

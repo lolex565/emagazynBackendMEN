@@ -59,7 +59,7 @@ router.route('/:storeId').delete((req, res) => {
         .catch(err => res.status(400).json('error: ' + err));
 });
 
-router.route('/update/:storeId').patch((req, res) => {
+router.route('/:storeId').patch((req, res) => {
     const newStoreOldId = req.body.storeOldId;
     const newStoreName = req.body.storeName;
     const newStoreStatus = req.body.storeStatus;

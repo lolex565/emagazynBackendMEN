@@ -62,9 +62,9 @@ router.route('/register').post(async (req, res) => {
     })
 
     let email = await transporter.sendMail({
-        from: '"system emagazyn" <emagazyn@onet.pl>',
+        from: '"system emagazyn noreply" <'+ String(process.env.EMAIL_LOGIN) + '>',
         to: String(user.email),
-        subject: "weryfikacja konta",
+        subject: "weryfikacja konta w systemie emagazyn",
         html: emailBody,
     });
 

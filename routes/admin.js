@@ -34,7 +34,7 @@ router.route('/:email').patch((req, res) => {
         .catch(err => res.status(400).json('error: ' + err));
 });
 
-router.route('/:email').delete((req, res) => {
+router.route('/:email').delete((req, res) => { //TODO zablokuj usuwanie innych adminów
     User.findOneAndDelete({email: req.params.email})
     .then(User => res.json(User))
     .catch(err => res.status(400).json('error: ' + err));

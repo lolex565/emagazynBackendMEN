@@ -7,6 +7,7 @@ Jest to aplikacja webowa służąca do zarządzania magazynem(w przyszłości ar
 ## struktura pliku .env
 ```
 ATLAS_URI=
+PORT=
 DROP_COLLECTION=
 REGEX_STORE=
 REGEX_ARCHIVE=
@@ -16,6 +17,8 @@ ARCHIVE_PREFIX=
 LIBRARY_PREFIX=
 EMAIL_REGEX=
 TOKEN_SECRET=
+EMAIL_SECRET=
+ADRESS=
 ```
 ## dla frontu
 autoryzacja odbywa się poprzez dodanie tokena do requestów w headerze AUTH-TOKEN

@@ -11,9 +11,9 @@ router.route('/register').post(async (req, res) => {
     }
     if (error) return res.status(400).json({error: error.details[0].message});
 
-    const isEmailExist = await User.findOne({email: req.body.email});
+    const doesEmailExist = await User.findOne({email: req.body.email});
 
-    if (isEmailExist) return res.status(400).json({error: "Email already exists"});
+    if (doesEmailExist) return res.status(400).json({error: "Email already exists"});
 
     const salt = await bcrypt.genSalt(10);
     const password = await bcrypt.hash(req.body.password, salt);
@@ -30,8 +30,17 @@ router.route('/register').post(async (req, res) => {
         },
     });
 
+    const verificationToken = jwt.sign(
+        {
+            name: user.name,
+            id: user._id,                   //TODO wysyłać token weryfikacyjny mailem
+            email: user.email
+        },
+        process.env.TOKEN_SECRET
+    );
+
     user.save()
-        .then(() => res.json('item added!'))
+        .then(() => res.json({message:'item added!',verificationToken: verificationToken}))
         .catch(err => res.status(400).json('error :' + err));
 });
 
@@ -44,6 +53,8 @@ router.route('/login').post(async(req, res) => {
 
     if(!user) return res.status(400).json({error: "wrong email"});
 
+    if(!user.verified) return res.status(400).json({error: "user not verified"});
+
     const validPassword = await bcrypt.compare(req.body.password, user.password);
 
     if (!validPassword) return res.status(400).json({error: "wrong password"});
@@ -53,6 +64,7 @@ router.route('/login').post(async(req, res) => {
     {
         name: user.name,
         id: user._id,
+        email: user.email,
         roles: user.roles,
     },
     process.env.TOKEN_SECRET
@@ -66,5 +78,9 @@ router.route('/login').post(async(req, res) => {
         },
     });
 });
+
+//TODO dodać odświeżanie i wygasanie tokena
+
+//TODO dodać przywracanie hasła
 
 module.exports = router;

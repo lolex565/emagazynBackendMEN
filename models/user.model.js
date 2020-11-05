@@ -40,6 +40,10 @@ const userSchema = new Schema({
             type: Boolean,
         },
     },
+    verified: {
+        type: Boolean,
+        default: false,
+    }
 });
 
 module.exports = mongoose.model("User", userSchema);

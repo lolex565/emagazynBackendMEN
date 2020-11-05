@@ -13,7 +13,7 @@ counters.exist((status) => {
 
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT;
 
 app.use(cors());
 app.use(express.json());
@@ -26,17 +26,22 @@ connection.once('open', () => {
 });
 
 const storeRoutes = require('./routes/store');
-const authRoutes = require('./routes/auth');
-const adminRoutes = require('./routes/admin')
+const authRoutes = require('./routes/auth'); 
+const adminRoutes = require('./routes/admin');
 const verifyToken = require('./routes/token_validators/validate-token');
 const verifyStoreToken = require('./routes/token_validators/validate-store-token');
 const verifyAdminToken = require('./routes/token_validators/validate-admin-token');
 const publicStoreRoutes = require('./routes/public-store-routes');
+const userRoutes = require('./routes/user');
+const accountVerificationRoute = require('./routes/accountverification');
+//TODO przywracanie hasła
 
 app.use('/public/store', publicStoreRoutes);
 app.use('/store', verifyStoreToken, storeRoutes);
 app.use('/admin', verifyAdminToken, adminRoutes);
 app.use('/auth', authRoutes);
+app.use('/user', verifyToken, userRoutes);
+app.use('/verify',accountVerificationRoute);
 
 app.listen(port, () => {
     console.log('server on port: ' + port);

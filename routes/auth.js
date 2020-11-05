@@ -37,7 +37,10 @@ router.route('/register').post(async (req, res) => {
             id: user._id,                   //TODO wysyłać token weryfikacyjny mailem
             email: user.email
         },
-        process.env.TOKEN_SECRET
+        process.env.TOKEN_SECRET,
+        {
+            expiresIn: "24h"
+        }
     );
 
     let emailBody = "aby zweyfikować swoje konto w systemie EMagazyn, wklej poniższy token w odpowiednie pole na stronie <br /><b>" + verificationToken + "</b>";
@@ -93,7 +96,10 @@ router.route('/login').post(async(req, res) => {
         email: user.email,
         roles: user.roles,
     },
-    process.env.TOKEN_SECRET
+    process.env.TOKEN_SECRET,
+    {
+        expiresIn: "72h"
+    }
     );
     
     res.header("auth-token", token).json({

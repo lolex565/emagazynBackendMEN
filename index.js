@@ -34,6 +34,7 @@ const verifyAdminToken = require('./routes/token_validators/validate-admin-token
 const publicStoreRoutes = require('./routes/public-store-routes');
 const userRoutes = require('./routes/user');
 const accountVerificationRoute = require('./routes/accountverification');
+const renewRoute = require('./routes/renew.js');
 //TODO przywracanie hasła
 
 app.use('/public/store', publicStoreRoutes);
@@ -42,6 +43,7 @@ app.use('/admin', verifyAdminToken, adminRoutes);
 app.use('/auth', authRoutes);
 app.use('/user', verifyToken, userRoutes);
 app.use('/verify',accountVerificationRoute);
+app.use('/renew', verifyToken, renewRoute);
 
 app.listen(port, () => {
     console.log('server on port: ' + port);

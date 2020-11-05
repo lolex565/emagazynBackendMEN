@@ -19,6 +19,10 @@ EMAIL_REGEX=
 TOKEN_SECRET=
 EMAIL_SECRET=
 ADRESS=
+EMAIL_LOGIN=
+EMAIL_PASSWORD=
+EMAIL_SMTP_HOST=
+EMAIL_SMTP_PORT=
 ```
 ## dla frontu
 autoryzacja odbywa się poprzez dodanie tokena do requestów w headerze AUTH-TOKEN

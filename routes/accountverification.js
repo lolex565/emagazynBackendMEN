@@ -9,9 +9,8 @@ router.route('/:registrationToken').get(async (req, res) => {
     try {
         const verified = jwt.verify(token, process.env.TOKEN_SECRET);
         req.user = verified;
-        console.log(req.user);
         await User.findOneAndUpdate({email: req.user.email}, {verified: true});
-        res.json({message:'verified account'});
+        res.json({message:'verified account', name: req.user.name});
     } catch (err) {
         res.status(400).json({error: "token not valid"});
     }

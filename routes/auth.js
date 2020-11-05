@@ -2,6 +2,7 @@ const router = require('express').Router();
 const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const {registerValidation, loginValidation} = require("../validation");
 
 router.route('/register').post(async (req, res) => {
@@ -39,8 +40,33 @@ router.route('/register').post(async (req, res) => {
         process.env.TOKEN_SECRET
     );
 
+    let emailBody = "aby zweyfikować swoje konto w systemie EMagazyn, wklej poniższy token w odpowiednie pole na stronie <br /><b>" + verificationToken + "</b>";
+
+    let transporter = nodemailer.createTransport({
+        host: String(process.env.EMAIL_SMTP_HOST),
+        port: process.env.EMAIL_SMTP_PORT,
+        secure: true, //TODO przepisać w .env nowego maila bo działa tylko onet blokuje
+        auth : {
+            user: String(process.env.EMAIL_LOGIN),
+            pass: String(process.env.EMAIL_PASSWORD),
+        },
+    });
+
+    transporter.verify((err) => {
+        if (err) {
+            res.status(400).json({error: err})
+        }
+    })
+
+    let email = await transporter.sendMail({
+        from: '"system emagazyn" <emagazyn@onet.pl>',
+        to: String(user.email),
+        subject: "weryfikacja konta",
+        html: emailBody,
+    });
+
     user.save()
-        .then(() => res.json({message:'item added!',verificationToken: verificationToken}))
+        .then(() => res.json({message:'item added!',verificationToken: verificationToken, messageId: email.messageId}))
         .catch(err => res.status(400).json('error :' + err));
 });
 

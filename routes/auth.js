@@ -48,11 +48,14 @@ router.route('/register').post(async (req, res) => {
     let transporter = nodemailer.createTransport({
         host: String(process.env.EMAIL_SMTP_HOST),
         port: process.env.EMAIL_SMTP_PORT,
-        secure: true, //TODO przepisać w .env nowego maila bo działa tylko onet blokuje
+        secure: false, //TODO przepisać w .env nowego maila bo działa tylko onet blokuje
         auth : {
             user: String(process.env.EMAIL_LOGIN),
             pass: String(process.env.EMAIL_PASSWORD),
         },
+        tls:{
+            ciphers:'SSLv3'
+        }
     });
 
     transporter.verify((err) => {

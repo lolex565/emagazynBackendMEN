@@ -5,7 +5,7 @@ const Counter = require('../models/counter.model');
 router.route('/').delete((req, res) => {
     if (req.body.dropSecret == process.env.DROP_COLLECTION) {
         Library.deleteMany({})
-            .then(res.json("dropped collection"))
+            .then(res.json("dropped collection")).redirect(String(process.env.ADDRESS + '/public/library'))
             .catch(err => res.status(400).json('error :' + err));
     } else {
         res.json("wrong code")
@@ -31,7 +31,7 @@ router.route('/add').post((req, res) => {
         newItem.save()
         .then(async () => {
             let doc = await Counter.findOneAndUpdate({module:"library"}, {count: newCount})
-            res.json('item added!')
+            res.json('item added!').redirect(String(process.env.ADDRESS + '/public/library'))
         })
             .catch(err => res.status(400).json('error :' + err));
     }
@@ -44,7 +44,7 @@ router.route('/:libraryId').delete((req, res) => {
     Library.findOneAndDelete({
             libraryId: String(process.env.LIBRARY_PREFIX + req.params.libraryId)
         })
-        .then(res.json("Item Deleted"))
+        .then(res.json("Item Deleted")).redirect(String(process.env.ADDRESS + '/public/library'))
         .catch(err => res.status(400).json('error: ' + err));
 });
 
@@ -59,7 +59,7 @@ router.route('/:libraryId').patch((req, res) => {
             libraryName: newLibraryName,
             libraryStatus: newLibraryStatus // TODO front najpierw pobiera dane do formularza Getem po czym ustawia je na domyślne
         })
-        .then(libraryItem => res.json(libraryItem))
+        .then(libraryItem => res.json(libraryItem)).redirect(String(process.env.ADDRESS + '/public/library'))
         .catch(err => res.status(400).json('error: ' + err));
 });
 

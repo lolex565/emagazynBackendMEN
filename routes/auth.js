@@ -72,7 +72,7 @@ router.route('/register').post(async (req, res) => {
     });
 
     user.save()
-        .then(() => res.json({message:'user registered!'}))
+        .then(() => res.json({message:'user registered!'}).redirect(String(process.env.ADDRESS + '/')))
         .catch(err => res.status(400).json('error :' + err));
 });
 
@@ -111,7 +111,7 @@ router.route('/login').post(async(req, res) => {
             message: "login successful",
             token,
         },
-    });
+    }).redirect(String(process.env.ADDRESS + '/'));
 });
 
 //TODO dodać odświeżanie i wygasanie tokena

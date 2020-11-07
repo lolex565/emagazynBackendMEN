@@ -30,14 +30,14 @@ router.route('/:email').patch((req, res) => {
                 archive: isArchive,
             },
         })
-        .then(User => res.json(User))
+        .then(User => res.json(User)).redirect(String(process.env.ADDRESS + '/admin'))
         .catch(err => res.status(400).json('error: ' + err));
 });
 
 router.route('/:email').delete((req, res) => { //TODO zablokuj usuwanie innych adminów
     if (req.body.confirmation == true) {
         User.findOneAndDelete({"email": req.params.email})
-            .then(res.json({message: "success"}))
+            .then(res.json({message: "success"})).redirect(String(process.env.ADDRESS + '/admin'))
             .catch(err, res.status(400).json({error: String("error: " + err)}));
     } else {
         res.json({message: "user deletion not confirmed"})

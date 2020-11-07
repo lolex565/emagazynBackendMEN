@@ -34,7 +34,7 @@ router.route('/register').post(async (req, res) => {
     const verificationToken = jwt.sign(
         {
             name: user.name,
-            id: user._id,                   //TODO wysyłać token weryfikacyjny mailem
+            id: user._id,
             email: user.email
         },
         process.env.TOKEN_SECRET,
@@ -48,7 +48,7 @@ router.route('/register').post(async (req, res) => {
     let transporter = nodemailer.createTransport({
         host: String(process.env.EMAIL_SMTP_HOST),
         port: process.env.EMAIL_SMTP_PORT,
-        secure: false, //TODO przepisać w .env nowego maila bo działa tylko onet blokuje
+        secure: false,
         auth : {
             user: String(process.env.EMAIL_LOGIN),
             pass: String(process.env.EMAIL_PASSWORD),
@@ -72,7 +72,7 @@ router.route('/register').post(async (req, res) => {
     });
 
     user.save()
-        .then(() => res.json({message:'item added!',verificationToken: verificationToken, messageId: email.messageId}))
+        .then(() => res.json({message:'user registered!'}))
         .catch(err => res.status(400).json('error :' + err));
 });
 

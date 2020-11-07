@@ -26,19 +26,25 @@ connection.once('open', () => {
 });
 
 const storeRoutes = require('./routes/store');
+const libraryRoutes = require('./routes/library');
+const archiveRoutes = require('./routes/archive');
 const authRoutes = require('./routes/auth'); 
 const adminRoutes = require('./routes/admin');
 const verifyToken = require('./routes/token_validators/validate-token');
 const verifyStoreToken = require('./routes/token_validators/validate-store-token');
+const verifyLibraryToken = require('./routes/token_validators/validate-library-token');
+const verifyArchiveToken = require('./routes/token_validators/validate-archive-token');
 const verifyAdminToken = require('./routes/token_validators/validate-admin-token');
-const publicStoreRoutes = require('./routes/public-store-routes');
+const publicRoutes = require('./routes/public-routes');
 const userRoutes = require('./routes/user');
 const accountVerificationRoute = require('./routes/accountverification');
 const renewRoute = require('./routes/renew.js');
 //TODO przywracanie hasła
 
-app.use('/public/store', publicStoreRoutes);
+app.use('/public', publicRoutes);
 app.use('/store', verifyStoreToken, storeRoutes);
+app.use('/library', verifyLibraryToken, libraryRoutes);
+app.use('/archive', verifyArchiveToken, archiveRoutes);
 app.use('/admin', verifyAdminToken, adminRoutes);
 app.use('/auth', authRoutes);
 app.use('/user', verifyToken, userRoutes);

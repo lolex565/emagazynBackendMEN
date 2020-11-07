@@ -19,7 +19,6 @@ router.route('/add').post((req, res) => {
         const stamp = String(Number(counter.count+1)).padStart(5, 0);
         const storeId = String(process.env.STORE_PREFIX+stamp);
         const newCount = Number(counter.count+1);
-        let doc = await Counter.findOneAndUpdate({module:"store"}, {count: newCount})
 
         const newItem = new Store({
             storeId,
@@ -29,7 +28,10 @@ router.route('/add').post((req, res) => {
         });
 
         newItem.save()
-            .then(() => res.json('item added!'))
+            .then(async () => {
+                let doc = await Counter.findOneAndUpdate({module:"store"}, {count: newCount})
+                res.json('item added!')
+            })
             .catch(err => res.status(400).json('error :' + err));
     }
 

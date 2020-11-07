@@ -16,14 +16,22 @@ const initialize = async () => {
     });
     
     storeCounter.save();
-        
-    //const archiveCounter = new Counter({
+    
+    const libraryCounter = new Counter({
+        module: "library",
+        count: 0,
+    });
+    
+    libraryCounter.save();
 
-    //});
-    //const libraryCounter = new Counter({
-
-    // });
+    const archiveCounter = new Counter({
+        module: "archive",
+        count: 0,
+    });
+    
+    archiveCounter.save();
+    
 };
-//TODO zrobić countery dla archiwum i biblioteki
+
 
 module.exports = {exist:exist, initialize:initialize};

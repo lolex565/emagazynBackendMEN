@@ -43,8 +43,8 @@ router.route('/register').post(async (req, res) => {
         }
     );
 
-    let emailBody = "aby zweyfikować swoje konto w systemie EMagazyn, wklej poniższy token w odpowiednie pole na stronie <br /><b>" + verificationToken + "</b>";
-
+    let emailBody = "aby zweyfikować swoje konto w systemie EMagazyn, wklej poniższy token w odpowiednie pole na stronie "+process.env.ADRESS+"/verify.html <br /><b>" + verificationToken + "</b>";
+                                                                //TODO przepisać maila w funkcje
     let transporter = nodemailer.createTransport({
         host: String(process.env.EMAIL_SMTP_HOST),
         port: process.env.EMAIL_SMTP_PORT,
@@ -72,24 +72,24 @@ router.route('/register').post(async (req, res) => {
     });
 
     user.save()
-        .then(() => res.json({message:'user registered!'}).redirect(String(process.env.ADDRESS + '/')))
-        .catch(err => res.status(400).json('error :' + err));
+        .then(() => res.json({message:'user registered!'}))
+        .catch(err => res.status(400).json({error: err}));
 });
 
 router.route('/login').post(async(req, res) => {
     const { error } = loginValidation(req.body);
 
-    if(error) return res.status(400).json({ error:   error.details[0].message });
+    if(error) return res.status(400).json({ error:   error.details[0].message, errorCode: 0});
 
     const user = await User.findOne({email: req.body.email});
 
-    if(!user) return res.status(400).json({error: "wrong email"});
+    if(!user) return res.status(400).json({error: "wrong email", errorCode: 1});
 
-    if(!user.verified) return res.status(400).json({error: "user not verified"});
+    if(!user.verified) return res.status(400).json({error: "user not verified", errorCode: 2});
 
     const validPassword = await bcrypt.compare(req.body.password, user.password);
 
-    if (!validPassword) return res.status(400).json({error: "wrong password"});
+    if (!validPassword) return res.status(400).json({error: "wrong password", errorCode: 3});
 
     
     const token = jwt.sign(
@@ -111,7 +111,7 @@ router.route('/login').post(async(req, res) => {
             message: "login successful",
             token,
         },
-    }).redirect(String(process.env.ADDRESS + '/'));
+    });
 });
 
 //TODO dodać odświeżanie i wygasanie tokena

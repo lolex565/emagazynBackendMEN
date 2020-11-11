@@ -2,10 +2,10 @@ const router = require('express').Router();
 const Store = require('../models/store.model');
 const Counter = require('../models/counter.model');
 
-router.route('/').delete((req, res) => {
+router.route('/drop').delete((req, res) => {
     if (req.body.dropSecret == process.env.DROP_COLLECTION) {
         Store.deleteMany({})
-            .then(res.json("dropped collection")).redirect(String(process.env.ADDRESS + '/public/store'))
+            .then(res.json("dropped collection"))
             .catch(err => res.status(400).json('error :' + err));
     } else {
         res.json("wrong code")
@@ -30,7 +30,7 @@ router.route('/add').post((req, res) => {
         newItem.save()
             .then(async () => {
                 let doc = await Counter.findOneAndUpdate({module:"store"}, {count: newCount})
-                res.json('item added!').redirect(String(process.env.ADDRESS + '/public/store'))
+                res.json({message:'item added!', success: true, item: storeName})
             })
             .catch(err => res.status(400).json('error :' + err));
     }
@@ -39,15 +39,20 @@ router.route('/add').post((req, res) => {
 
 });
 
-router.route('/:storeId').delete((req, res) => {
-    Store.findOneAndDelete({
-            storeId: String(process.env.STORE_PREFIX + req.params.storeId)
-        })
-        .then(res.json("Item Deleted")).redirect(String(process.env.ADDRESS + '/public/store'))
-        .catch(err => res.status(400).json('error: ' + err));
+router.route('/delete/:storeId').delete((req, res) => {
+    if (req.body.confirmation == true) {
+        Store.findOneAndDelete({
+                storeId: String(process.env.STORE_PREFIX + req.params.storeId)
+            })
+            .then(storeItem => {if (!storeItem) res.json({message:'no item to delete!', success: false})})
+            .then(storeItem => res.json({message:"Item Deleted", success: true}))
+            .catch(err => res.status(400).json('error: ' + err));
+    } else {
+        res.json({message: "deletion not confirmed"})
+    };
 });
 
-router.route('/:storeId').patch((req, res) => {
+router.route('/edit/:storeId').patch((req, res) => {
     const newStoreOldId = req.body.storeOldId;
     const newStoreName = req.body.storeName;
     const newStoreStatus = req.body.storeStatus;
@@ -58,7 +63,8 @@ router.route('/:storeId').patch((req, res) => {
             storeName: newStoreName,
             storeStatus: newStoreStatus // TODO front najpierw pobiera dane do formularza Getem po czym ustawia je na domyślne
         })
-        .then(storeItem => res.json(storeItem)).redirect(String(process.env.ADDRESS + '/public/store'))
+        .then(storeItem => {if (!storeItem) res.json({message:'no item to edit!', success: false})})
+        .then(storeItem => res.json({message:'item edited!', success: true, item: newStoreName}))
         .catch(err => res.status(400).json('error: ' + err));
 });
 

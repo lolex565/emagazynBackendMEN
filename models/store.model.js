@@ -25,6 +25,9 @@ const storeSchema = new Schema({
         required: false,
 
     },
+    addedBy: {
+        type: String,
+    },
 }, {
     timestamps: true,
 });

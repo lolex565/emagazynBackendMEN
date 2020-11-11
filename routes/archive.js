@@ -19,12 +19,14 @@ router.route('/add').post((req, res) => {
         const stamp = String(Number(counter.count+1)).padStart(5, 0);
         const archiveId = String(process.env.ARCHIVE_PREFIX+stamp);
         const newCount = Number(counter.count+1);
+        const addedBy = req.user.name;
 
         const newItem = new Archive({
             archiveId,
             archiveOldId,
             archiveName,
             archiveStatus,
+            addedBy,
         });
 
         newItem.save()

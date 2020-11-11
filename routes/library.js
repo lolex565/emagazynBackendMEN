@@ -19,12 +19,14 @@ router.route('/add').post((req, res) => {
         const stamp = String(Number(counter.count+1)).padStart(5, 0);
         const libraryId = String(process.env.LIBRARY_PREFIX+stamp);
         const newCount = Number(counter.count+1);
+        const addedBy = req.user.name;
 
         const newItem = new Library({
             libraryId,
             libraryOldId,
             libraryName,
             libraryStatus,
+            addedBy,
         });
 
         newItem.save()

@@ -2,7 +2,7 @@ const router = require('express').Router();
 const Library = require('../models/library.model');
 const Counter = require('../models/counter.model');
 
-router.route('/').delete((req, res) => {
+router.route('/drop').delete((req, res) => {
     if (req.body.dropSecret == process.env.DROP_COLLECTION) {
         Library.deleteMany({})
             .then(res.json("dropped collection"))
@@ -19,7 +19,6 @@ router.route('/add').post((req, res) => {
         const stamp = String(Number(counter.count+1)).padStart(5, 0);
         const libraryId = String(process.env.LIBRARY_PREFIX+stamp);
         const newCount = Number(counter.count+1);
-        let doc = await Counter.findOneAndUpdate({module:"library"}, {count: newCount})
 
         const newItem = new Library({
             libraryId,
@@ -29,10 +28,10 @@ router.route('/add').post((req, res) => {
         });
 
         newItem.save()
-        .then(async () => {
-            let doc = await Counter.findOneAndUpdate({module:"library"}, {count: newCount})
-            res.json('item added!')
-        })
+            .then(async () => {
+                let doc = await Counter.findOneAndUpdate({module:"library"}, {count: newCount})
+                res.json({message:'item added!', success: true, item: libraryName})
+            })
             .catch(err => res.status(400).json('error :' + err));
     }
 
@@ -40,15 +39,20 @@ router.route('/add').post((req, res) => {
 
 });
 
-router.route('/:libraryId').delete((req, res) => {
-    Library.findOneAndDelete({
-            libraryId: String(process.env.LIBRARY_PREFIX + req.params.libraryId)
-        })
-        .then(res.json("Item Deleted"))
-        .catch(err => res.status(400).json('error: ' + err));
+router.route('/delete/:libraryId').delete((req, res) => {
+    if (req.body.confirmation == true) {
+        Library.findOneAndDelete({
+                libraryId: String(process.env.LIBRARY_PREFIX + req.params.libraryId)
+            })
+            .then(libraryItem => {if (!libraryItem) res.json({message:'no item to delete!', success: false})})
+            .then(libraryItem => res.json({message:"Item Deleted", success: true}))
+            .catch(err => res.status(400).json('error: ' + err));
+    } else {
+        res.json({message: "deletion not confirmed"})
+    };
 });
 
-router.route('/:libraryId').patch((req, res) => {
+router.route('/edit/:libraryId').patch((req, res) => {
     const newLibraryOldId = req.body.libraryOldId;
     const newLibraryName = req.body.libraryName;
     const newLibraryStatus = req.body.libraryStatus;
@@ -59,7 +63,8 @@ router.route('/:libraryId').patch((req, res) => {
             libraryName: newLibraryName,
             libraryStatus: newLibraryStatus // TODO front najpierw pobiera dane do formularza Getem po czym ustawia je na domyślne
         })
-        .then(libraryItem => res.json(libraryItem))
+        .then(libraryItem => {if (!libraryItem) res.json({message:'no item to edit!', success: false})})
+        .then(libraryItem => res.json({message:'item edited!', success: true, item: newLibraryName}))
         .catch(err => res.status(400).json('error: ' + err));
 });
 

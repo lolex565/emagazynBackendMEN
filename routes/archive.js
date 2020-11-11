@@ -2,7 +2,7 @@ const router = require('express').Router();
 const Archive = require('../models/archive.model');
 const Counter = require('../models/counter.model');
 
-router.route('/').delete((req, res) => {
+router.route('/drop').delete((req, res) => {
     if (req.body.dropSecret == process.env.DROP_COLLECTION) {
         Archive.deleteMany({})
             .then(res.json("dropped collection"))
@@ -19,7 +19,6 @@ router.route('/add').post((req, res) => {
         const stamp = String(Number(counter.count+1)).padStart(5, 0);
         const archiveId = String(process.env.ARCHIVE_PREFIX+stamp);
         const newCount = Number(counter.count+1);
-        let doc = await Counter.findOneAndUpdate({module:"archive"}, {count: newCount})
 
         const newItem = new Archive({
             archiveId,
@@ -29,10 +28,10 @@ router.route('/add').post((req, res) => {
         });
 
         newItem.save()
-        .then(async () => {
-            let doc = await Counter.findOneAndUpdate({module:"archive"}, {count: newCount})
-            res.json('item added!')
-        })
+            .then(async () => {
+                let doc = await Counter.findOneAndUpdate({module:"archive"}, {count: newCount})
+                res.json({message:'item added!', success: true, item: archiveName})
+            })
             .catch(err => res.status(400).json('error :' + err));
     }
 
@@ -40,15 +39,20 @@ router.route('/add').post((req, res) => {
 
 });
 
-router.route('/:archiveId').delete((req, res) => {
-    Archive.findOneAndDelete({
-            archiveId: String(process.env.ARCHIVE_PREFIX + req.params.archiveId)
-        })
-        .then(res.json("Item Deleted"))
-        .catch(err => res.status(400).json('error: ' + err));
+router.route('/delete/:archiveId').delete((req, res) => {
+    if (req.body.confirmation == true) {
+        Archive.findOneAndDelete({
+                archiveId: String(process.env.ARCHIVE_PREFIX + req.params.archiveId)
+            })
+            .then(archiveItem => {if (!archiveItem) res.json({message:'no item to delete!', success: false})})
+            .then(archiveItem => res.json({message:"Item Deleted", success: true}))
+            .catch(err => res.status(400).json('error: ' + err));
+    } else {
+        res.json({message: "deletion not confirmed"})
+    };
 });
 
-router.route('/:archiveId').patch((req, res) => {
+router.route('/edit/:archiveId').patch((req, res) => {
     const newArchiveOldId = req.body.archiveOldId;
     const newArchiveName = req.body.archiveName;
     const newArchiveStatus = req.body.archiveStatus;
@@ -59,7 +63,8 @@ router.route('/:archiveId').patch((req, res) => {
             archiveName: newArchiveName,
             archiveStatus: newArchiveStatus // TODO front najpierw pobiera dane do formularza Getem po czym ustawia je na domyślne
         })
-        .then(archiveItem => res.json(archiveItem))
+        .then(archiveItem => {if (!archiveItem) res.json({message:'no item to edit!', success: false})})
+        .then(archiveItem => res.json({message:'item edited!', success: true, item: newArchiveName}))
         .catch(err => res.status(400).json('error: ' + err));
 });
 

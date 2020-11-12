@@ -6,7 +6,7 @@ Taak wreszcie projekt stanął, może dzięki zdalnemu nauczniu, ale mniejsza.
 Jest to aplikacja webowa służąca do zarządzania magazynem(w przyszłości archiwum i biblioteką) Hufca ZHP Gorlice, a w przyszłości mam nadzieję że też innych hufców.
 ## struktura pliku .env
 ```
-ATLAS_URI=
+MONGO_URI=
 PORT=
 DROP_COLLECTION=
 REGEX_STORE=

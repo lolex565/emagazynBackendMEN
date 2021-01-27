@@ -1,3 +1,4 @@
+const { string } = require('joi');
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
@@ -23,7 +24,27 @@ const librarySchema = new Schema({
     libraryStatus: {
         type: String,
         required: false,
-
+    },
+    libraryGenre: {
+        type: String,
+        required: false,
+    },
+    libraryTarget: {
+        type: String,
+        required: false,
+    },
+    libraryBorrowed: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
+    libraryBorrower: {
+        type: String,
+        required: false,
+    },
+    libraryLocation: {
+        type: String,
+        required: true,
     },
     addedBy: {
         type: String,
@@ -31,6 +52,8 @@ const librarySchema = new Schema({
 }, {
     timestamps: true,
 });
+
+//TODO Dodać do ksążek numer ISBN
 
 const Library = mongoose.model('Library', librarySchema);
 

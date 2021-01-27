@@ -1,3 +1,4 @@
+const { string } = require('joi');
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
@@ -23,7 +24,18 @@ const storeSchema = new Schema({
     storeStatus: {
         type: String,
         required: false,
-
+    },
+    storeLocation: {
+        type: String,
+        required: true,
+    },
+    storeValue: {
+        type: Number,
+        required: false,
+    },
+    storeAmount: {
+        type: Number,
+        required: true,
     },
     addedBy: {
         type: String,

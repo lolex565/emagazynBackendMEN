@@ -14,7 +14,7 @@ router.route('/drop').delete((req, res) => {
 
 router.route('/add').post((req, res) => {
 
-    async function addStoreItem(storeOldId, storeName, storeStatus) {
+    async function addStoreItem(storeOldId, storeName, storeStatus, storeLocation, storeValue, storeAmount) {
         const counter = await Counter.findOne({module:"store"});
         const stamp = String(Number(counter.count+1)).padStart(5, 0);
         const storeId = String(process.env.STORE_PREFIX+stamp);
@@ -26,6 +26,9 @@ router.route('/add').post((req, res) => {
             storeOldId,
             storeName,
             storeStatus,
+            storeLocation,
+            storeValue,
+            storeAmount,
             addedBy,
         });
 
@@ -37,7 +40,7 @@ router.route('/add').post((req, res) => {
             .catch(err => res.status(400).json('error :' + err));
     }
 
-    addStoreItem(req.body.storeOldId, req.body.storeName, req.body.storeStatus);
+    addStoreItem(req.body.storeOldId, req.body.storeName, req.body.storeStatus, req.body.storeLocation, req.body.storeValue, req.body.storeAmount);
 
 });
 

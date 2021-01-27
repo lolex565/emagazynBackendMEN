@@ -23,7 +23,6 @@ const archiveSchema = new Schema({
     archiveStatus: {
         type: String,
         required: false,
-
     },
     addedBy: {
         type: String,
@@ -31,6 +30,8 @@ const archiveSchema = new Schema({
 }, {
     timestamps: true,
 });
+
+//TODO Dodać do archiwum rok utworzenia, i RODO
 
 const Archive = mongoose.model('Archive', archiveSchema);
 

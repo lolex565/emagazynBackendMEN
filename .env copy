@@ -1,8 +1,0 @@
-ATLAS_URI=mongodb+srv://emagazyn:gorlice@cluster0.bembm.mongodb.net/emagazyn?retryWrites=true&w=majority
-DROP_COLLECTION=execute_order_66
-REGEX_STORE=ZHP\/KRK\/GRL\/MAGA\/[0-9]{5}
-REGEX_ARCHIVE=ZHP\/KRK\/GRL\/ARCH\/[0-9]{5}
-REGEX_LIBRARY=ZHP\/KRK\/GRL\/BIBL\/[0-9]{5}
-STORE_PREFIX=ZHP/KRK/GRL/MAGA/
-ARCHIVE_PREFIX=ZHP/KRK/GRL/ARCH/
-LIBRARYPREFIX=ZHP/KRK/GRL/BIBL/

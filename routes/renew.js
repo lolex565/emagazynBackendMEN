@@ -1,10 +1,7 @@
-const router = require('express').Router();
-const jwt = require('jsonwebtoken');
+const router = require("express").Router();
+const jwt = require("jsonwebtoken");
 
-router.route('/').get(async (req, res) => {
-    
-    
-
+router.route("/").get(async (req, res) => {
     const token = jwt.sign(
         {
             name: req.user.name,
@@ -14,17 +11,17 @@ router.route('/').get(async (req, res) => {
         },
         process.env.TOKEN_SECRET,
         {
-            expiresIn: "72h"
+            expiresIn: "72h",
         }
-        );
-        
-        res.header("auth-token", token).json({
-            error: null,
-            data:{
-                message: "token renewed",
-                token,
-            },
-        });
+    );
+
+    res.header("auth-token", token).json({
+        error: null,
+        data: {
+            message: "token renewed",
+            token,
+        },
+    });
 });
 
 module.exports = router;

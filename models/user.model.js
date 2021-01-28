@@ -43,7 +43,7 @@ const userSchema = new Schema({
     verified: {
         type: Boolean,
         default: false,
-    }
+    },
 });
 
 module.exports = mongoose.model("User", userSchema);

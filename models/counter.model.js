@@ -1,17 +1,17 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
 const counterSchema = new Schema({
-    module:{
+    module: {
         type: String,
         unique: true,
     },
-    count:{
+    count: {
         type: Number,
-    }
+    },
 });
 
-const Counter = mongoose.model('Counter', counterSchema);
+const Counter = mongoose.model("Counter", counterSchema);
 
 module.exports = Counter;

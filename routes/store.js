@@ -1,40 +1,48 @@
 const router = require("express").Router();
 const Store = require("../models/store.model");
 const Counter = require("../models/counter.model");
+const currentModule = Store;
+const currentModuleName = "Store";
+
 
 router.route("/drop").delete((req, res) => {
-    if (req.body.dropSecret == process.env.DROP_COLLECTION) {
-        Store.deleteMany({})
-            .then(res.json("dropped collection"))
-            .catch((err) => res.status(400).json("error :" + err));
-    } else {
-        res.json("wrong code");
-    }
+    
+    async function drop(module) {
+        if (req.body.dropSecret == process.env.DROP_COLLECTION) {
+            module.deleteMany({})
+                .then(res.json("dropped collection"))
+                .catch((err) => res.status(400).json("error :" + err));
+        } else {
+            res.json("wrong code");
+        };
+    };
+    
+    drop(currentModule)
 });
 
 router.route("/add").post((req, res) => {
     async function addItem(
         requestBody,
-        module
+        moduleName
     ) {
         const counter = await Counter.findOne({
-            module: module,
+            module: moduleName,
         });
         const stamp = String(Number(counter.count + 1)).padStart(5, 0);
-        requestBody[module+"Id"] = String(process.env.STORE_PREFIX + stamp);
+        requestBody[moduleName+"Id"] = String(process.env.STORE_PREFIX + stamp);
         const newCount = Number(counter.count + 1);
         requestBody["addedBy"] = req.user.name;
     
         
     
-        const newItem = new Store(requestBody);
+        const newItem = new currentModule(requestBody);
     
         newItem
             .save()
             .then(async () => {
                 let doc = await Counter.findOneAndUpdate(
                     {
-                        module: module,
+                        module: moduleName,
                     },
                     {
                         count: newCount,
@@ -43,7 +51,7 @@ router.route("/add").post((req, res) => {
                 res.json({
                     message: "item added!",
                     success: true,
-                    item: requestBody[module+"Name"],
+                    item: requestBody[moduleName+"Name"],
                 });
             })
             .catch((err) => res.status(400).json("error :" + err));
@@ -51,7 +59,7 @@ router.route("/add").post((req, res) => {
 
     addItem(
         req.body,
-        "store"
+        currentModuleName
     );
 });
 
@@ -99,6 +107,5 @@ router.route("/edit/:storeId").patch((req, res) => {
         .catch((err) => res.status(400).json("error: " + err));
 });
 
-//TODO przepisać takiego edita na inne endpointy
 
 module.exports = router;

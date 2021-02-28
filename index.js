@@ -43,7 +43,6 @@ const publicRoutes = require("./routes/public-routes");
 const userRoutes = require("./routes/user");
 const accountVerificationRoute = require("./routes/accountverification");
 const renewRoute = require("./routes/renew.js");
-const testRoute = require("./routes/testroutes.js");
 //TODO przywracanie hasła
 
 app.use("/public", publicRoutes);
@@ -55,7 +54,6 @@ app.use("/auth", authRoutes);
 app.use("/user", verifyToken, userRoutes);
 app.use("/verify", accountVerificationRoute);
 app.use("/renew", verifyToken, renewRoute);
-app.use("/testroutes", testRoute);
 
 app.listen(port, () => {
     console.log("server on port: " + port);

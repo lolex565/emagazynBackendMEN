@@ -13,41 +13,28 @@ router.route("/drop").delete((req, res) => {
 });
 
 router.route("/add").post((req, res) => {
-    async function addStoreItem(
-        storeOldId,
-        storeName,
-        storeStatus,
-        storeLocation,
-        storeValue,
-        storeAmount
+    async function addItem(
+        requestBody,
+        module
     ) {
         const counter = await Counter.findOne({
-            module: "store",
+            module: module,
         });
         const stamp = String(Number(counter.count + 1)).padStart(5, 0);
-        const storeId = String(process.env.STORE_PREFIX + stamp);
+        requestBody[module+"Id"] = String(process.env.STORE_PREFIX + stamp);
         const newCount = Number(counter.count + 1);
-        const addedBy = req.user.name;
-
-        //TODO ogarnąć mniej okrężne rozwiązanie, dodawać tylko do req jsona storeID i addedBy na innych endpointach to samo
-
-        const newItem = new Store({
-            storeId,
-            storeOldId,
-            storeName,
-            storeStatus,
-            storeLocation,
-            storeValue,
-            storeAmount,
-            addedBy,
-        });
-
+        requestBody["addedBy"] = req.user.name;
+    
+        
+    
+        const newItem = new Store(requestBody);
+    
         newItem
             .save()
             .then(async () => {
                 let doc = await Counter.findOneAndUpdate(
                     {
-                        module: "store",
+                        module: module,
                     },
                     {
                         count: newCount,
@@ -56,19 +43,15 @@ router.route("/add").post((req, res) => {
                 res.json({
                     message: "item added!",
                     success: true,
-                    item: storeName,
+                    item: requestBody[module+"Name"],
                 });
             })
             .catch((err) => res.status(400).json("error :" + err));
     }
 
-    addStoreItem(
-        req.body.storeOldId,
-        req.body.storeName,
-        req.body.storeStatus,
-        req.body.storeLocation,
-        req.body.storeValue,
-        req.body.storeAmount
+    addItem(
+        req.body,
+        "store"
     );
 });
 

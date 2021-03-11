@@ -1,104 +1,69 @@
 const router = require("express").Router();
 const Archive = require("../models/archive.model");
-const Counter = require("../models/counter.model");
+const CRUD = require("../functions/crud.js");
+const { date } = require("joi");
+const currentModule = Archive;
+const currentModuleName = "archive";
+const currentModulePrefix = process.env.ARCHIVE_PREFIX;
 
 router.route("/drop").delete((req, res) => {
-    if (req.body.dropSecret == process.env.DROP_COLLECTION) {
-        Archive.deleteMany({})
-            .then(res.json("dropped collection"))
-            .catch((err) => res.status(400).json("error :" + err));
-    } else {
-        res.json("wrong code");
-    }
+    CRUD.drop(currentModule, req.body.dropSecret).then(async (data) => {
+        if (data.success) {
+            res.status(200).json(data);
+        } else {
+            res.status(500).json(data);
+        }
+    });
 });
 
-router.route("/add").post((req, res) => {
-    async function addArchiveItem(archiveOldId, archiveName, archiveStatus) {
-        const counter = await Counter.findOne({ module: "archive" });
-        const stamp = String(Number(counter.count + 1)).padStart(5, 0);
-        const archiveId = String(process.env.ARCHIVE_PREFIX + stamp);
-        const newCount = Number(counter.count + 1);
-        const addedBy = req.user.name;
-
-        const newItem = new Archive({
-            archiveId,
-            archiveOldId,
-            archiveName,
-            archiveStatus,
-            addedBy,
-        });
-
-        newItem
-            .save()
-            .then(async () => {
-                let doc = await Counter.findOneAndUpdate(
-                    { module: "archive" },
-                    { count: newCount }
-                );
-                res.json({
-                    message: "item added!",
-                    success: true,
-                    item: archiveName,
-                });
-            })
-            .catch((err) => res.status(400).json("error :" + err));
-    }
-
-    addArchiveItem(
-        req.body.archiveOldId,
-        req.body.archiveName,
-        req.body.archiveStatus
-    );
+router.route("/add").post(async (req, res) => {
+    CRUD.addItem(
+        req.body,
+        currentModuleName,
+        currentModule,
+        currentModulePrefix,
+        req.user.name
+    ).then(async (data) => {
+        console.log(typeof data.success);
+        if (data.success === true) {
+            res.status(200).json(data);
+        } else {
+            res.status(500).json(data);
+        }
+    });
 });
 
 router.route("/delete/:archiveId").delete((req, res) => {
-    if (req.body.confirmation == true) {
-        Archive.findOneAndDelete({
-            archiveId: String(
-                process.env.ARCHIVE_PREFIX + req.params.archiveId
-            ),
-        })
-            .then((archiveItem) => {
-                if (!archiveItem)
-                    res.json({ message: "no item to delete!", success: false });
-            })
-            .then((archiveItem) =>
-                res.json({ message: "Item Deleted", success: true })
-            )
-            .catch((err) => res.status(400).json("error: " + err));
-    } else {
-        res.json({ message: "deletion not confirmed" });
-    }
+    CRUD.deleteItem(
+        req.params.archiveId,
+        req.body.confirmation,
+        currentModuleName,
+        currentModule,
+        currentModulePrefix
+    ).then(async (data) => {
+        if (data.success) {
+            res.status(200).json(data);
+        } else {
+            res.status(500).json(data);
+        }
+    });
 });
 
 router.route("/edit/:archiveId").patch((req, res) => {
-    const newArchiveOldId = req.body.archiveOldId;
-    const newArchiveName = req.body.archiveName;
-    const newArchiveStatus = req.body.archiveStatus;
-    Archive.findOneAndUpdate(
-        {
-            archiveId: String(
-                process.env.ARCHIVE_PREFIX + req.params.archiveId
-            ),
-        },
-        {
-            archiveOldId: newArchiveOldId,
-            archiveName: newArchiveName,
-            archiveStatus: newArchiveStatus, // TODO front najpierw pobiera dane do formularza Getem po czym ustawia je na domyślne
+    CRUD.editItem(
+        req.body,
+        req.params.archiveId,
+        currentModuleName,
+        currentModule,
+        currentModulePrefix,
+        req.user.name
+    ).then(async (data) => {
+        if (data.success) {
+            res.status(200).json(data);
+        } else {
+            res.status(500).json(data);
         }
-    )
-        .then((archiveItem) => {
-            if (!archiveItem)
-                res.json({ message: "no item to edit!", success: false });
-        })
-        .then((archiveItem) =>
-            res.json({
-                message: "item edited!",
-                success: true,
-                item: newArchiveName,
-            })
-        )
-        .catch((err) => res.status(400).json("error: " + err));
+    });
 });
 
 module.exports = router;

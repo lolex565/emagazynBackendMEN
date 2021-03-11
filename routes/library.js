@@ -1,104 +1,69 @@
 const router = require("express").Router();
 const Library = require("../models/library.model");
-const Counter = require("../models/counter.model");
+const CRUD = require("../functions/crud.js");
+const { date } = require("joi");
+const currentModule = Library;
+const currentModuleName = "library";
+const currentModulePrefix = process.env.LIBRARY_PREFIX;
 
 router.route("/drop").delete((req, res) => {
-    if (req.body.dropSecret == process.env.DROP_COLLECTION) {
-        Library.deleteMany({})
-            .then(res.json("dropped collection"))
-            .catch((err) => res.status(400).json("error :" + err));
-    } else {
-        res.json("wrong code");
-    }
+    CRUD.drop(currentModule, req.body.dropSecret).then(async (data) => {
+        if (data.success) {
+            res.status(200).json(data);
+        } else {
+            res.status(500).json(data);
+        }
+    });
 });
 
-router.route("/add").post((req, res) => {
-    async function addLibraryItem(libraryOldId, libraryName, libraryStatus) {
-        const counter = await Counter.findOne({ module: "library" });
-        const stamp = String(Number(counter.count + 1)).padStart(5, 0);
-        const libraryId = String(process.env.LIBRARY_PREFIX + stamp);
-        const newCount = Number(counter.count + 1);
-        const addedBy = req.user.name;
-
-        const newItem = new Library({
-            libraryId,
-            libraryOldId,
-            libraryName,
-            libraryStatus,
-            addedBy,
-        });
-
-        newItem
-            .save()
-            .then(async () => {
-                let doc = await Counter.findOneAndUpdate(
-                    { module: "library" },
-                    { count: newCount }
-                );
-                res.json({
-                    message: "item added!",
-                    success: true,
-                    item: libraryName,
-                });
-            })
-            .catch((err) => res.status(400).json("error :" + err));
-    }
-
-    addLibraryItem(
-        req.body.libraryOldId,
-        req.body.libraryName,
-        req.body.libraryStatus
-    );
+router.route("/add").post(async (req, res) => {
+    CRUD.addItem(
+        req.body,
+        currentModuleName,
+        currentModule,
+        currentModulePrefix,
+        req.user.name
+    ).then(async (data) => {
+        console.log(typeof data.success);
+        if (data.success === true) {
+            res.status(200).json(data);
+        } else {
+            res.status(500).json(data);
+        }
+    });
 });
 
 router.route("/delete/:libraryId").delete((req, res) => {
-    if (req.body.confirmation == true) {
-        Library.findOneAndDelete({
-            libraryId: String(
-                process.env.LIBRARY_PREFIX + req.params.libraryId
-            ),
-        })
-            .then((libraryItem) => {
-                if (!libraryItem)
-                    res.json({ message: "no item to delete!", success: false });
-            })
-            .then((libraryItem) =>
-                res.json({ message: "Item Deleted", success: true })
-            )
-            .catch((err) => res.status(400).json("error: " + err));
-    } else {
-        res.json({ message: "deletion not confirmed" });
-    }
+    CRUD.deleteItem(
+        req.params.libraryId,
+        req.body.confirmation,
+        currentModuleName,
+        currentModule,
+        currentModulePrefix
+    ).then(async (data) => {
+        if (data.success) {
+            res.status(200).json(data);
+        } else {
+            res.status(500).json(data);
+        }
+    });
 });
 
 router.route("/edit/:libraryId").patch((req, res) => {
-    const newLibraryOldId = req.body.libraryOldId;
-    const newLibraryName = req.body.libraryName;
-    const newLibraryStatus = req.body.libraryStatus;
-    Library.findOneAndUpdate(
-        {
-            libraryId: String(
-                process.env.LIBRARY_PREFIX + req.params.libraryId
-            ),
-        },
-        {
-            libraryOldId: newLibraryOldId,
-            libraryName: newLibraryName,
-            libraryStatus: newLibraryStatus, // TODO front najpierw pobiera dane do formularza Getem po czym ustawia je na domyślne
+    CRUD.editItem(
+        req.body,
+        req.params.libraryId,
+        currentModuleName,
+        currentModule,
+        currentModulePrefix,
+        req.user.name
+    ).then(async (data) => {
+        if (data.success) {
+            res.status(200).json(data);
+        } else {
+            res.status(500).json(data);
         }
-    )
-        .then((libraryItem) => {
-            if (!libraryItem)
-                res.json({ message: "no item to edit!", success: false });
-        })
-        .then((libraryItem) =>
-            res.json({
-                message: "item edited!",
-                success: true,
-                item: newLibraryName,
-            })
-        )
-        .catch((err) => res.status(400).json("error: " + err));
+    });
 });
 
 module.exports = router;

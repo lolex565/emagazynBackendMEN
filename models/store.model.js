@@ -41,6 +41,9 @@ const storeSchema = new Schema(
         addedBy: {
             type: String,
         },
+        lastEditedBy: {
+            type: String,
+        },
     },
     {
         timestamps: true,

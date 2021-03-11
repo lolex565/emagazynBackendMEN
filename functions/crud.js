@@ -1,148 +1,137 @@
 const Counter = require("../models/counter.model");
 
-async function drop(module, dropSecret) {
-    if (dropSecret == process.env.DROP_COLLECTION) {
-        let res = {};
-        let result = await module.deleteMany({});
-        if (result.ok) {
-            res.status = "dropped";
-            return res;
-        }
-    } else {
-        res.status = "not dropped";
-        return res;
-    }
-}
-
-/* async function addItem(
-    requestBody,
-    usedModuleName,
-    usedModule,
-    usedPrefix,
-    user
-) {
-    let res = {};
-    const counter = await Counter.findOne({
-        module: usedModuleName,
-    });
-    const stamp = String(Number(counter.count + 1)).padStart(5, 0);
-    requestBody[usedModuleName + "Id"] = String(usedPrefix + stamp);
-    const newCount = Number(counter.count + 1);
-    requestBody["addedBy"] = user;
-
-    const newItem = new usedModule(requestBody);
-    let result = await newItem
-        .save()
-        .then(async () => {
-            let doc = await Counter.findOneAndUpdate(
-                {
-                    module: usedModuleName,
-                },
-                {
-                    count: newCount,
-                }
-            );
-            res.message = "item added!";
-            res.success = true;
-            res.item = requestBody[usedModuleName + "Name"];
-        })
-        .catch((err) => (res.error = err));
-
-        if (result) {
-            return res;
-        }
-} */
-
-async function addItem(
-    requestBody,
-    usedModuleName,
-    usedModule,
-    usedPrefix,
-    user
-) {
-    let res = {};
-    const counter = await Counter.findOne({
-        module: usedModuleName,
-    });
-    const stamp = String(Number(counter.count + 1)).padStart(5, 0);
-    requestBody[usedModuleName + "Id"] = String(usedPrefix + stamp);
-    const newCount = Number(counter.count + 1);
-    requestBody["addedBy"] = user;
-
-    const newItem = new usedModule(requestBody);
-    let result = await newItem.save(async function (err, doc) {
-        if (err) return err;
-        let conterDoc = await Counter.findOneAndUpdate(
-            {
-                module: usedModuleName,
-            },
-            {
-                count: newCount,
+const drop = async (module, dropSecret) => {
+    return new Promise(async (resolve) => {
+        if (dropSecret == process.env.DROP_COLLECTION) {
+            let res = {};
+            let result = await module.deleteMany({});
+            if (result.ok) {
+                res.status = "dropped";
+                res.success = true;
+                resolve(res);
             }
-        );
-        res.message = "item added!";
-        res.success = true;
-        res.item = requestBody[usedModuleName + "Name"];
-        /* return res; */
+        } else {
+            res.status = "not dropped";
+            resolve(res);
+        }
     });
-    console.log(result); //TODO naprawić chrzanione save tak żeby zwracalo cokolwiek innego niż undefined
-}
+};
 
+const addItem = async (
+    requestBody,
+    usedModuleName,
+    usedModule,
+    usedPrefix,
+    user
+) => {
+    return new Promise(async (resolve) => {
+        let res = {};
+        const counter = await Counter.findOne({
+            module: usedModuleName,
+        });
+        const stamp = String(Number(counter.count + 1)).padStart(5, 0);
+        requestBody[usedModuleName + "Id"] = String(usedPrefix + stamp);
+        const newCount = Number(counter.count + 1);
+        requestBody["addedBy"] = user;
 
-async function deleteItem(
+        const newItem = await new usedModule(requestBody);
+        let result = await newItem.save(async function (err, doc) {
+            if (err) {
+                res.success = false;
+                resolve(res);
+            } else {
+                let conterDoc = await Counter.findOneAndUpdate(
+                    {
+                        module: usedModuleName,
+                    },
+                    {
+                        count: newCount,
+                    }
+                );
+                res.message = "item added!";
+                res.success = true;
+                res.item = requestBody[usedModuleName + "Name"];
+                resolve(res);
+            }
+        });
+    });
+};
+
+const deleteItem = async (
     requestParam,
+    confirmation,
     usedModuleName,
     usedModule,
     usedPrefix
-) {
-    if (req.body.confirmation == true) {
+) => {
+    return new Promise(async (resolve) => {
+        let res = {};
+        if (confirmation == true) {
+            let filter = {};
+            filter[usedModuleName + "Id"] = String(usedPrefix + requestParam);
+            usedModule
+                .findOneAndDelete(filter)
+                .then((Item) => {
+                    if (!Item) {
+                        res.message = "no item to delete!";
+                        res.success = false;
+                        resolve(res);
+                    }
+                })
+                .then((Item) => {
+                    res.message = "Item Deleted";
+                    res.success = true;
+                    resolve(res);
+                })
+                .catch((err) => {
+                    res.success = false;
+                    resolve(res);
+                });
+        } else {
+            res.message = "deletion not confirmed";
+            res.success = false;
+            res.conf = false;
+            resolve(res);
+        }
+    });
+};
+
+const editItem = async (
+    requestBody,
+    requestParam,
+    usedModuleName,
+    usedModule,
+    usedPrefix,
+    user
+) => {
+    return new Promise(async (resolve) => {
+        let res = {};
         let filter = {};
+        requestBody.lastEditedBy = user;
         filter[usedModuleName + "Id"] = String(usedPrefix + requestParam);
         usedModule
-            .findOneAndDelete(filter)
+            .findOneAndUpdate(filter, requestBody)
             .then((Item) => {
-                if (!Item)
-                    res.json({
-                        message: "no item to delete!",
-                        success: false,
-                    });
+                if (Item) {
+                    res.message = "item edited!";
+                    res.success = true;
+                    res.item = Item[usedModuleName + "Name"];
+                    resolve(res);
+                } else {
+                    res.success = false;
+                    res.message = "something went wrong";
+                    resolve(res);
+                }
+                
             })
-            .then((Item) =>
-                res.json({
-                    message: "Item Deleted",
-                    success: true,
-                })
-            )
-            .catch((err) => res.status(400).json("error: " + err));
-    } else {
-        res.json({
-            message: "deletion not confirmed",
-        });
-    }
-}
+            .catch((err) => {
+                res.success = false;
+                resolve(res);
+            });
+    });
+};
 
-async function editItem(
-    requestBody,
-    requestParam,
-    usedModuleName,
-    usedModule,
-    usedPrefix
-) {
-    let filter = {};
-    filter[usedModuleName + "Id"] = String(usedPrefix + requestParam);
-    usedModule
-        .findOneAndUpdate(filter, requestBody)
-        .then((Item) =>
-            res.json({
-                message: "item edited!",
-                success: true,
-                item: Item[usedModuleName + "Name"],
-            })
-        )
-        .catch((err) => res.status(400).json("error: " + err));
-}
-
-exports.drop = drop;
-exports.addItem = addItem;
-exports.deleteItem = deleteItem;
-exports.editItem = editItem;
+module.exports.drop = drop;
+module.exports.addItem = addItem;
+module.exports.deleteItem = deleteItem;
+module.exports.editItem = editItem;

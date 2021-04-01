@@ -24,7 +24,6 @@ router.route("/add").post(async (req, res) => {
         currentModulePrefix,
         req.user.name
     ).then(async (data) => {
-        console.log(typeof data.success);
         if (data.success === true) {
             res.status(200).json(data);
         } else {

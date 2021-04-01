@@ -1,17 +1,25 @@
 const Counter = require("../models/counter.model");
+const errorHandler = require("./errorHandler.js");
 
-const drop = async (module, dropSecret) => {
+const drop = async (module, dropSecret, usedModuleName) => {
     return new Promise(async (resolve) => {
         if (dropSecret == process.env.DROP_COLLECTION) {
             let res = {};
-            let result = await module.deleteMany({});
-            if (result.ok) {
-                res.status = "dropped";
-                res.success = true;
-                resolve(res);
-            }
+            let result = await module.deleteMany({}, async (err, doc) => {
+                if (err) {
+                    errorHandler.saveErrorLog(usedModuleName, err);
+                    res.status = "not dropped";
+                    res.success = false;
+                    resolve(res);
+                } else {
+                    res.status = "dropped";
+                    res.success = true;
+                    resolve(res);
+                }
+            });
         } else {
             res.status = "not dropped";
+            res.success = false;
             resolve(res);
         }
     });
@@ -37,6 +45,7 @@ const addItem = async (
         const newItem = await new usedModule(requestBody);
         let result = await newItem.save(async function (err, doc) {
             if (err) {
+                errorHandler.saveErrorLog(usedModuleName, err);
                 res.success = false;
                 resolve(res);
             } else {
@@ -84,6 +93,7 @@ const deleteItem = async (
                     resolve(res);
                 })
                 .catch((err) => {
+                    errorHandler.saveErrorLog(usedModuleName, err);
                     res.success = false;
                     resolve(res);
                 });
@@ -122,9 +132,9 @@ const editItem = async (
                     res.message = "something went wrong";
                     resolve(res);
                 }
-                
             })
             .catch((err) => {
+                errorHandler.saveErrorLog(usedModuleName, err);
                 res.success = false;
                 resolve(res);
             });

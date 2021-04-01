@@ -16,7 +16,6 @@ router.route("/").get(async (req, res) => {
     );
 
     res.header("auth-token", token).json({
-        error: null,
         data: {
             message: "token renewed",
             token,

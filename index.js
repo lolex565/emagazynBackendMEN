@@ -18,13 +18,16 @@ app.use(cors());
 app.use(express.json());
 
 const uri = process.env.MONGO_URI;
+
 mongoose.connect(uri, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
 });
+
 const connection = mongoose.connection;
+
 connection.once("open", () => {
     console.log("connected to db");
 });

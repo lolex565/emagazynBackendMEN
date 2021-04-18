@@ -6,6 +6,30 @@ const currentModule = Store;
 const currentModuleName = "store";
 const currentModulePrefix = process.env.STORE_PREFIX;
 
+router.route("/get").get((req, res) => {
+    CRUD.getAll(
+        currentModuleName,
+        currentModule,
+        "",
+        false
+    )
+        .then((storeItems) => res.status(200).json(storeItems))
+        .catch((err) => res.status(500).json("error: " + err));
+});
+
+router.route("/get/:id").get((req, res) => {
+    CRUD.getOne(
+        currentModuleName,
+        currentModule,
+        currentModulePrefix,
+        req.params.id,
+        "",
+        false
+    )
+        .then((storeItems) => res.status(200).json(storeItems))
+        .catch((err) => res.status(500).json("error: " + err));
+});
+
 router.route("/drop").delete((req, res) => {
     CRUD.drop(currentModule, req.body.dropSecret).then(async (data) => {
         if (data.success) {

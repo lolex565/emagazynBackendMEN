@@ -6,6 +6,30 @@ const currentModule = Library;
 const currentModuleName = "library";
 const currentModulePrefix = process.env.LIBRARY_PREFIX;
 
+router.route("/get").get((req, res) => {
+    CRUD.getAll(
+        currentModuleName,
+        currentModule,
+        "",
+        false
+    )
+        .then((libraryItems) => res.status(200).json(libraryItems))
+        .catch((err) => res.status(500).json("error: " + err));
+});
+
+router.route("/get/:id").get((req, res) => {
+    CRUD.getOne(
+        currentModuleName,
+        currentModule,
+        currentModulePrefix,
+        req.params.id,
+        "",
+        false
+    )
+        .then((libraryItems) => res.status(200).json(libraryItems))
+        .catch((err) => res.status(500).json("error: " + err));
+});
+
 router.route("/drop").delete((req, res) => {
     CRUD.drop(currentModule, req.body.dropSecret).then(async (data) => {
         if (data.success) {

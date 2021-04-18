@@ -2,66 +2,77 @@ const router = require("express").Router();
 const Archive = require("../models/archive.model");
 const Library = require("../models/library.model");
 const Store = require("../models/store.model");
+const CRUD = require("../functions/crud.js");
 
 router.route("/store").get((req, res) => {
-    Store.find(
-        {},
-        "storeId storeOldId storeName storeStatus storeLocation storeValue storeAmount"
+    CRUD.getAll(
+        "store",
+        Store,
+        "storeId storeOldId storeName storeStatus storeAmount",
+        true
     )
-        .then((storeItems) => res.json(storeItems))
-        .catch((err) => res.status(400).json("error: " + err));
+        .then((storeItems) => res.status(200).json(storeItems))
+        .catch((err) => res.status(500).json("error: " + err));
 });
 
 router.route("/store/:storeId").get((req, res) => {
-    Store.findOne(
-        {
-            storeId: String(process.env.STORE_PREFIX + req.params.storeId),
-        },
-        "storeId storeOldId storeName storeStatus storeLocation storeValue storeAmount"
+    CRUD.getOne(
+        "store",
+        Store,
+        process.env.STORE_PREFIX,
+        req.params.storeId,
+        "storeId storeOldId storeName storeStatus storeAmount",
+        true
     )
-        .then((storeItem) => res.json(storeItem))
-        .catch((err) => res.status(400).json("error: " + err));
+        .then((storeItems) => res.status(200).json(storeItems))
+        .catch((err) => res.status(500).json("error: " + err));
 });
 
 router.route("/library").get((req, res) => {
-    Library.find(
-        {},
-        "libraryId libraryOldId libraryName libraryStatus libraryGenre libraryTarget libraryBorrowed libraryLocation"
+    CRUD.getAll(
+        "library",
+        Library,
+        "libraryId libraryOldId libraryName libraryStatus ISBN libraryGenre libraryTarget libraryBorrowed",
+        true
     )
-        .then((libraryItems) => res.json(libraryItems))
-        .catch((err) => res.status(400).json("error: " + err));
+        .then((libraryItems) => res.status(200).json(libraryItems))
+        .catch((err) => res.status(500).json("error: " + err));
 });
 
 router.route("/library/:libraryId").get((req, res) => {
-    Library.findOne(
-        {
-            libraryId: String(
-                process.env.LIBRARY_PREFIX + req.params.libraryId
-            ),
-        },
-        "libraryId libraryOldId libraryName libraryStatus libraryGenre libraryTarget libraryBorrowed libraryLocation"
+    CRUD.getOne(
+        "store",
+        Store,
+        process.env.LIBRARY_PREFIX,
+        req.params.libraryId,
+        "libraryId libraryOldId libraryName libraryStatus ISBN libraryGenre libraryTarget libraryBorrowed",
+        true
     )
-        .then((libraryItem) => res.json(libraryItem))
-        .catch((err) => res.status(400).json("error: " + err));
+        .then((storeItems) => res.status(200).json(storeItems))
+        .catch((err) => res.status(500).json("error: " + err));
 });
 
 router.route("/archive").get((req, res) => {
-    Archive.find({}, "archiveId archiveOldId archiveName archiveStatus")
-        .then((archiveItems) => res.json(archiveItems))
-        .catch((err) => res.status(400).json("error: " + err));
+    CRUD.getAll(
+        "archive",
+        Archive,
+        "archiveId archiveOldId archiveName archiveStatus yearOfCreation",
+        true
+    )
+        .then((archiveItems) => res.status(200).json(archiveItems))
+        .catch((err) => res.status(500).json("error: " + err));
 });
 
 router.route("/archive/:archiveId").get((req, res) => {
-    Archive.findOne(
-        {
-            archiveId: String(
-                process.env.ARCHIVE_PREFIX + req.params.archiveId
-            ),
-        },
-        "archiveId archiveOldId archiveName archiveStatus"
+    CRUD.getOne(
+        "archive",
+        Archive,
+        process.env.ARCHIVE_PREFIX,
+        req.params.archiveId,
+        "archiveId archiveOldId archiveName archiveStatus yearOfCreation",
+        true
     )
-        .then((archiveItem) => res.json(archiveItem))
-        .catch((err) => res.status(400).json("error: " + err));
+        .then((archiveItems) => res.status(200).json(archiveItems))
+        .catch((err) => res.status(500).json("error: " + err));
 });
-
 module.exports = router;

@@ -38,6 +38,11 @@ const storeSchema = new Schema(
             type: Number,
             required: true,
         },
+        public: {
+            type: Boolean,
+            required: true,
+            default: false,
+        },
         addedBy: {
             type: String,
         },

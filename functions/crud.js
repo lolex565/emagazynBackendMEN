@@ -141,7 +141,83 @@ const editItem = async (
     });
 };
 
+const getAll = async (usedModuleName, usedModule, filterString, public) => {
+    return new Promise(async (resolve) => {
+        let res = {};
+        if (public == true) {
+            usedModule
+                .find({ public: true }, filterString)
+                .then((Items) => {
+                    res = Items;
+                    resolve(res);
+                })
+                .catch((err) => {
+                    errorHandler.saveErrorLog(usedModuleName, err);
+                    res.success = false;
+                    resolve(res);
+                });
+        } else {
+            usedModule
+                .find({})
+                .then((Items) => {
+                    res = Items;
+                    resolve(res);
+                })
+                .catch((err) => {
+                    errorHandler.saveErrorLog(usedModuleName, err);
+                    res.success = false;
+                    resolve(res);
+                });
+        }
+    });
+};
+
+const getOne = async (
+    usedModuleName,
+    usedModule,
+    usedPrefix,
+    id,
+    filterString,
+    public
+) => {
+    return new Promise(async (resolve) => {
+        let res = {};
+        let jsonFilter = {};
+        let search = usedModuleName + "Id";
+        let searchString = String(usedPrefix + id.padStart(5,0));
+        jsonFilter[search] = searchString;
+        if (public == true) {
+            jsonFilter["public"] = true;
+            usedModule
+                .find(jsonFilter, filterString)
+                .then((Items) => {
+                    res = Items;
+                    resolve(res);
+                })
+                .catch((err) => {
+                    errorHandler.saveErrorLog(usedModuleName, err);
+                    res.success = false;
+                    resolve(res);
+                });
+        } else {
+            usedModule
+                .find(jsonFilter)
+                .then((Items) => {
+                    res = Items;
+                    resolve(res);
+                })
+                .catch((err) => {
+                    errorHandler.saveErrorLog(usedModuleName, err);
+                    res.success = false;
+                    resolve(res);
+                });
+        }
+    });
+};
+
 module.exports.drop = drop;
 module.exports.addItem = addItem;
 module.exports.deleteItem = deleteItem;
 module.exports.editItem = editItem;
+module.exports.getAll = getAll;
+module.exports.getOne = getOne;

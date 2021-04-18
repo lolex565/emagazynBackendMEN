@@ -6,6 +6,30 @@ const currentModule = Archive;
 const currentModuleName = "archive";
 const currentModulePrefix = process.env.ARCHIVE_PREFIX;
 
+router.route("/get").get((req, res) => {
+    CRUD.getAll(
+        currentModuleName,
+        currentModule,
+        "",
+        false
+    )
+        .then((archiveItems) => res.status(200).json(archiveItems))
+        .catch((err) => res.status(500).json("error: " + err));
+});
+
+router.route("/get/:id").get((req, res) => {
+    CRUD.getOne(
+        currentModuleName,
+        currentModule,
+        currentModulePrefix,
+        req.params.id,
+        "",
+        false
+    )
+        .then((archiveItems) => res.status(200).json(archiveItems))
+        .catch((err) => res.status(500).json("error: " + err));
+});
+
 router.route("/drop").delete((req, res) => {
     CRUD.drop(currentModule, req.body.dropSecret).then(async (data) => {
         if (data.success) {

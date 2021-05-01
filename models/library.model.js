@@ -49,7 +49,7 @@ const librarySchema = new Schema(
         },
         ISBN: {
             type: Number,
-            maxlength:13,
+            maxlength: 13,
             minlength: 10,
             required: false,
         },
@@ -69,8 +69,6 @@ const librarySchema = new Schema(
         timestamps: true,
     }
 );
-
-//TODO Dodać do ksążek numer ISBN
 
 const Library = mongoose.model("Library", librarySchema);
 

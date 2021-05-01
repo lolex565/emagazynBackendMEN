@@ -141,12 +141,18 @@ const editItem = async (
     });
 };
 
-const getAll = async (usedModuleName, usedModule, filterString, public) => {
+const getAll = async (
+    usedModuleName,
+    usedModule,
+    filterString,
+    public,
+    role
+) => {
     return new Promise(async (resolve) => {
         let res = {};
         if (public == true) {
             usedModule
-                .find({ public: true }, filterString)
+                .find({ public: true }, filterString + " -_id")
                 .then((Items) => {
                     res = Items;
                     resolve(res);
@@ -157,8 +163,12 @@ const getAll = async (usedModuleName, usedModule, filterString, public) => {
                     resolve(res);
                 });
         } else {
+            let filter = "-_id -__v ";
+            if (role.admin != true) {
+                filter = filter + "-createdAt -updatedAt";
+            }
             usedModule
-                .find({})
+                .find({}, filter)
                 .then((Items) => {
                     res = Items;
                     resolve(res);
@@ -178,20 +188,21 @@ const getOne = async (
     usedPrefix,
     id,
     filterString,
-    public
+    public,
+    role
 ) => {
     return new Promise(async (resolve) => {
         let res = {};
         let jsonFilter = {};
         let search = usedModuleName + "Id";
-        let searchString = String(usedPrefix + id.padStart(5,0));
+        let searchString = String(usedPrefix + id.padStart(5, 0));
         jsonFilter[search] = searchString;
         if (public == true) {
             jsonFilter["public"] = true;
             usedModule
-                .find(jsonFilter, filterString)
-                .then((Items) => {
-                    res = Items;
+                .find(jsonFilter, filterString + " -_id")
+                .then((Item) => {
+                    res = Item;
                     resolve(res);
                 })
                 .catch((err) => {
@@ -200,10 +211,14 @@ const getOne = async (
                     resolve(res);
                 });
         } else {
+            let filter = "-_id -__v ";
+            if (role.admin != true) {
+                filter = filter + "-createdAt -updatedAt";
+            }
             usedModule
-                .find(jsonFilter)
-                .then((Items) => {
-                    res = Items;
+                .find(jsonFilter, filter)
+                .then((Item) => {
+                    res = Item;
                     resolve(res);
                 })
                 .catch((err) => {

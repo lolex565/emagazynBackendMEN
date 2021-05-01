@@ -7,12 +7,7 @@ const currentModuleName = "archive";
 const currentModulePrefix = process.env.ARCHIVE_PREFIX;
 
 router.route("/get").get((req, res) => {
-    CRUD.getAll(
-        currentModuleName,
-        currentModule,
-        "",
-        false
-    )
+    CRUD.getAll(currentModuleName, currentModule, "", false, req.user.roles)
         .then((archiveItems) => res.status(200).json(archiveItems))
         .catch((err) => res.status(500).json("error: " + err));
 });
@@ -24,7 +19,8 @@ router.route("/get/:id").get((req, res) => {
         currentModulePrefix,
         req.params.id,
         "",
-        false
+        false,
+        req.user.roles
     )
         .then((archiveItems) => res.status(200).json(archiveItems))
         .catch((err) => res.status(500).json("error: " + err));

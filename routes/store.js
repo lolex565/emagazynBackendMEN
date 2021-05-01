@@ -7,12 +7,7 @@ const currentModuleName = "store";
 const currentModulePrefix = process.env.STORE_PREFIX;
 
 router.route("/get").get((req, res) => {
-    CRUD.getAll(
-        currentModuleName,
-        currentModule,
-        "",
-        false
-    )
+    CRUD.getAll(currentModuleName, currentModule, "", false, req.user.roles)
         .then((storeItems) => res.status(200).json(storeItems))
         .catch((err) => res.status(500).json("error: " + err));
 });
@@ -24,7 +19,8 @@ router.route("/get/:id").get((req, res) => {
         currentModulePrefix,
         req.params.id,
         "",
-        false
+        false,
+        req.user.roles
     )
         .then((storeItems) => res.status(200).json(storeItems))
         .catch((err) => res.status(500).json("error: " + err));

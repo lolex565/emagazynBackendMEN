@@ -22,6 +22,22 @@ const librarySchema = new Schema(
             required: true,
             minlength: 3,
         },
+        author: {
+            type: String,
+            required: false,
+        },
+        publisher: {
+            type: String,
+            required: false,
+        },
+        year: {
+            type: String,
+            required: false,
+        },
+        category: {
+            type: String,
+            required: false,
+        },
         libraryStatus: {
             type: String,
             required: false,

@@ -32,7 +32,7 @@ router.route("/library").get((req, res) => {
     CRUD.getAll(
         "library",
         Library,
-        "libraryId libraryOldId libraryName libraryStatus ISBN libraryGenre libraryTarget libraryBorrowed",
+        "libraryId libraryOldId libraryName libraryStatus ISBN libraryGenre libraryTarget libraryBorrowed author publisher year category",
         true
     )
         .then((libraryItems) => res.status(200).json(libraryItems))
@@ -45,7 +45,7 @@ router.route("/library/:libraryId").get((req, res) => {
         Store,
         process.env.LIBRARY_PREFIX,
         req.params.libraryId,
-        "libraryId libraryOldId libraryName libraryStatus ISBN libraryGenre libraryTarget libraryBorrowed",
+        "libraryId libraryOldId libraryName libraryStatus ISBN libraryGenre libraryTarget libraryBorrowed author publisher year category",
         true
     )
         .then((storeItems) => res.status(200).json(storeItems))

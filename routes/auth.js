@@ -191,7 +191,7 @@ router.route("/refresh").get(async (req, res) => {
         },
     });
 })
-//TODO dodać odświeżanie i wygasanie tokena
+
 
 //TODO dodać przywracanie hasła
 

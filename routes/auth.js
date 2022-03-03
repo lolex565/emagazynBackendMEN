@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const { registerValidation, loginValidation } = require("../validation");
+const verifyToken = require("../functions/verifyToken");
 
 router.route("/register").post(async (req, res) => {
     const { error } = registerValidation(req.body);
@@ -162,6 +163,34 @@ router.route("/login").post(async (req, res) => {
     });
 });
 
+router.route("/refresh").get(async (req, res) => {
+    let token = req.header("auth-token");
+    const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+    
+    const user = await User.findOne({
+        email: verified.email,
+    });
+    const newToken = jwt.sign(
+        {
+            name: user.name,
+            id: user._id,
+            email: user.email,
+            roles: user.roles,
+        },
+        process.env.TOKEN_SECRET,
+        {
+            expiresIn: "72h",
+        }
+    );
+
+    res.header("auth-token", token).json({
+        error: null,
+        data: {
+            message: "refresh",
+            newToken,
+        },
+    });
+})
 //TODO dodać odświeżanie i wygasanie tokena
 
 //TODO dodać przywracanie hasła

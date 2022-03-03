@@ -1,6 +1,6 @@
-const fs = require("fs");
+const fs = require("fs");   //! import biblioteki do obsługi plików
 
-const getDate = () => {
+const getDate = () => {     //!funkcja zwracająca datę jako string w pożądanym formacie
     let d = new Date();
     let curr_date = d.getDate();
     let curr_month = d.getMonth();
@@ -25,8 +25,8 @@ const getDate = () => {
 };
 
 const saveErrorLog = (moduleName, errorLog) => {
-    fs.writeFile(
-        "./errorLogs/" + getDate() + "-" + moduleName + ".log",
+    fs.writeFile(   //!zapis do pliku
+        "./errorLogs/" + getDate() + "-" + moduleName + ".log", //!nazwa pliku z datą i godziną błędu
         errorLog,
         function (err) {
             if (err) return console.log(err);

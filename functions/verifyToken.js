@@ -32,4 +32,6 @@ function verifyToken(module) {
     };
 }
 
+//!dodaj odświeżanie tokena
+
 module.exports = verifyToken;

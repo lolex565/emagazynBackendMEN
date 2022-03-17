@@ -86,6 +86,14 @@ router.route("/edit/:storeId").patch((req, res) => {
     });
 });
 
+function convertDate(date) {
+    var d = new Date(date),
+        month = (String(d.getMonth() + 1)).padStart(2, "0"),
+        day = (String(d.getDate())).padStart(2, "0"),
+        year = d.getFullYear();
+        return String(day + "-" + month + "-" + year);
+}; //!tymczasowo tu, potem przenieść do funkcji w module
+
 router.route("/pdfraport").get((req, res) => {
     CRUD.getAll(currentModuleName, currentModule, "", false, req.user.roles)
         .then((storeItems) => {
@@ -96,6 +104,8 @@ router.route("/pdfraport").get((req, res) => {
                 "attachment; filename=raport.pdf"
             );
             pdf.pipe(res);
+            pdf.registerFont('Roboto', './fonts/Roboto-Regular.ttf');
+            pdf.font('Roboto');
             pdf.fontSize(25).text("Raport");
             pdf.moveDown();
             pdf.fontSize(15).text("Data: " + new Date());
@@ -103,18 +113,24 @@ router.route("/pdfraport").get((req, res) => {
             pdf.fontSize(15).text("Raport z danymi: ");
             pdf.moveDown();
             storeItems.forEach((item) => {
-                console.log(item);
+                //console.log(item);
                 pdf.fontSize(18).text(item.storeName);
                 pdf.moveDown();
                 pdf.fontSize(15).text("Cena: " + item.storeValue);
                 pdf.moveDown();
+                if (item.status != undefined) {
                 pdf.fontSize(15).text("Opis: " + item.status);
+                } else {
+                    pdf.fontSize(15).text("Opis: ---");
+                }
                 pdf.moveDown();
                 pdf.fontSize(15).text("Lokalizacja: " + item.storeLocation);
                 pdf.moveDown();
-                pdf.fontSize(15).text("Data dodania: " + Date(item.createdAt).toString());
+                pdf.fontSize(15).text("Ilość: " + item.storeAmount);
                 pdf.moveDown();
-                pdf.fontSize(15).text("Data modyfikacji: " + Date(item.updatedAt).toString());
+                pdf.fontSize(15).text("Data dodania: " + convertDate(Date(item.createdAt)));
+                pdf.moveDown();
+                pdf.fontSize(15).text("Data modyfikacji: " + convertDate(Date(item.updatedAt)));
                 pdf.moveDown();
             });
             //end pdf file 
